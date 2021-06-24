@@ -1,0 +1,355 @@
+---
+title: "Applied QE Project"
+author: 'Alexa Massengo - Student ID: 33640362'
+date: "19/06/2021"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+## R Markdown
+
+This is an R Markdown document that contains `r wordcountaddin::word_count()` words, excluding the code chunk.
+
+In order to obtain the above information, I ran the following:
+```{install.packages('devtools') include=FALSE}
+devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)}
+1
+```
+
+## Introduction
+
+The aim of this project is to highlight regional inequalities and determinants of secondary school student performance in England. In order to tackle this research question, I will answering numerous questions, whereby analysing what factors have a different effect on secondary school student performance in England. The key measurement of performance will be the Attainment 8 Score of pupil in Key Stage 4, a stage of education that occurs typically when pupils are aged 14 to 16. 
+
+Statistical analysis might highlight a number of things including: which regions are suffering the most and possible reasons why, and how determinants such as the environment students are in affects performance. Seeing that a student's performance might have a significance in determining their chances of pursuing further education and what profession they end up doing, breaking down the possible determinants of student achievement in exams at this age is extremely important and telling. This project is an important start to assessing the economic benefits of education as a whole, which reconciles microeconomic and macroeconomic approaches. In terms of microeconomic theory, there is an opportunity cost of pursuing further education which compares the monetary gains made as a school leaver, versus that of somebody that has access to higher paying careers due to having pursued further education. This is an interesting phenomena which carries into macroeconomic theory, where education is seen as a factor of long-run economic growth and stock of human capital is crucial in determining income growth. **
+
+## Dataset Characteristics
+
+The dataset used in this project was sourced from UK Department for Education's (DfE) publication of 'Secondary school performance tables in England: 2017', and it contains the revised key stage 4 results for academic year 2016/17, including general school information, student performance and school workforce and finance for (publicly maintained) schools in England. The size of the sample is 758 schools.
+
+The database contains a total of 29 variables detailing particular characteristics for each school such as: school unique reference number (URN), school name (SCHNAME), income per pupil (INCP) and number of full-time equivalent pupils (PUP).
+
+The data also includes the average Attainment 8 score per pupil (ATT8SCR). On its own it is an indicator of a student's performance level between 8 subjects including Mathematics and English which are both weighted. In the case of the data, this individual score has been average with that of other schoolmates. Another variables of interest when targeting this research question include: region in England (REGION), number of pupils at the end of key stage 4 (PUPKS4), pupil to teacher ratio (RATPUPTEA), median gross weekly pay in the Local Authority (LAPAY), expenditure in learning resources per pupil (EXPLRESP) and percentage of overall expenditure spent in learning resources (SHEXPLRES). **
+
+## Regional Inequalities
+
+By closely observing some variables against the different regions of England, the extent of regional inequalities in average student performance across secondary schools will be more clear. 
+
+I need to load the following packages:
+```{r, warning=FALSE,message=FALSE}
+library(readxl)
+library(magrittr)
+library(rpivotTable)
+library(plyr)
+library(dplyr)
+library(ggplot2) 
+library(sjPlot)
+library(tidyr)
+```
+
+
+# One Variable Analysis
+
+Firstly, in order to gauge the performance across different regions of England I will use the ATT8SCR variable to complete an one variable analysis.
+
+         # Load the data from Excel into R:
+```{r}
+AppQE_project_sample = read_excel("~/Documents/University/Applied QE/AppQE_project_sample - Full Sample (758 schools).xlsx")
+            attach(AppQE_project_sample)
+```
+        
+         # Second, construct the data frame:
+```{r}
+data_frame = data.frame(URN, ATT8SCR, REGION)
+```
+
+         # Pivot table with: rows = UK regions
+```{r}
+pivot_table = data_frame %>% group_by(REGION) %>% summarise(  count = n(), average.ATT8SCR = mean(ATT8SCR) )   %>%  mutate(  relative.average.ATT8SCR = ( average.ATT8SCR / mean(data_frame$ATT8SCR) )*100, diff.relative.average.ATT8SCR = relative.average.ATT8SCR - 100  )
+```
+   
+         # Sort the pivot table:
+         # Order by "diff.relative.average.ATT8SCR"
+```{r}
+pivot_table_sorted = pivot_table  %>%  arrange( desc( pivot_table$diff.relative.average.ATT8SCR ) )
+
+pivot_table_sorted
+```
+*Figure 1.1*
+
+In the above table, 'average.ATT8SCR' is the regional average Attainment 9 score for each region in its corresponding row. The range between the highest and lowest performing regions, London and North East, is `r 49.03475-44.03077` points. The relative average deviation illustrated as the 'diff.relative.average.ATT8SCR' column, shows that out of the 9 regions London is over-performing by a marginally larger percentage point of 5.5 (rounded up) than the national average.
+
+      # Plot the "diff.relative.average.ATT8SCR" column of the pivot table, with REGION as the y axis:
+```{r}
+      par(mar = c(5,12,3,1))                     # adjust the margins
+
+pivot_table_sorted_bar = pivot_table[order(pivot_table$diff.relative.average.ATT8SCR),]                    # opposite of above (but better for barplot below!)                    
+
+      barplot( pivot_table_sorted_bar$diff.relative.average.ATT8SCR, 
+
+                 horiz = TRUE,                      # rotate the axes
+                  xlim = c(-6 , 6),
+                  main = "Attainment 8 Score by UK Region (2016-2017)",     #choose your plot label
+                 #main =  "Average Student Performance by UK Region (2016-2017)",     #choose your plot label
+                beside = FALSE,
+                  ylab = " ",
+                  xlab = "Deviations from the UK average",
+             names.arg = pivot_table_sorted_bar$REGION, 
+             cex.names = 1,
+                   las = 2,                         # rotate the axis labels
+                   col = "purple" )
+
+```
+
+Source: Own computation based on DfE (2018)
+*Figure 1.2*
+
+Looking at the above bar chart, there is some possible grouping of close regions of England with similar patterns. Based on the sample, the North is the worst performing. London and South East are above average, but nevertheless the neighbouring East of England is below by around 2 points. 
+
+```{r}
+# Plot the histograms for ATT8SCR by REGION:
+
+
+region_1 = filter(data_frame, REGION == "07_London")
+region_2 = filter(data_frame, REGION == "01_North_East")
+
+
+par(mfrow = c(1, 2))
+
+                 hist( region_1$ATT8SCR  ,   
+                               main = "Average Student Performance in London",
+                                col = "khaki",
+                               xlab = " ",
+                               ylab = "Frequency",
+                             breaks = seq(from=20, to=85, by=5),                    # these are the upper bounds of the bins
+                               freq = FALSE )
+
+
+                 hist( region_2$ATT8SCR  ,   
+                               main = "Average Student Performance in North East",
+                                col = "pink",
+                               xlab = " ",
+                               ylab = "Frequency",
+                             breaks = seq(from=20, to=85, by=5),                    # these are the upper bounds of the bins
+                               freq = FALSE )
+```
+
+Source: Own computation based on DfE (2018)
+*Figure 1.3*
+
+```{r}
+median(region_1$ATT8SCR)
+mean(region_1$ATT8SCR)
+
+median(region_2$ATT8SCR)
+mean(region_2$ATT8SCR)
+```
+
+Comparing the histograms of London and North East, I can see how exactly the distributions differ. London's histogram is right-skewed, with around 6% of the averages in the 50 to 55 points range. North East's distribution is more bell shaped, with the exception of a high concentrated 40 to 45 points. For both sets of data, the medians are smaller than the mean. This showcases that the typical score is smaller than the average which might be distorted due to big outputs.  
+
+# Two Variable Analysis
+
+In order understand patterns between the extent of regional inequality and potential causation effects, I will look at other factors alongside the Attainment 8 score. 
+
+I'll start first with creating a joint pivot with EXPP and ATT8SCR together, because although there are multiple factors that contribute to an individual high Attainment 8 score I suspect that regions that have a higher expenditure per student might be better off.  
+
+```{r}
+# Create a joint pivot table with "EXPP" and "ATT8SCR" together:
+
+
+data_frame_2 = data.frame(URN, EXPP, ATT8SCR, REGION)
+
+
+
+pivot_table_2  =  data_frame_2 %>% 
+
+                  group_by(   REGION   ) %>% 
+
+                 summarise(                        count = n(),                      
+                                         average.EXPP    = mean(EXPP),
+                                         average.ATT8SCR = mean(ATT8SCR) )   %>%    
+ 
+                    mutate(          
+                                   relative.average.EXPP = ( average.EXPP / mean(data_frame_2$EXPP) )*100,
+                              diff.relative.average.EXPP = ( relative.average.EXPP - 100 ),
+
+                                   relative.average.ATT8SCR = ( average.ATT8SCR / mean(data_frame_2$ATT8SCR) )*100,
+                              diff.relative.average.ATT8SCR = ( relative.average.ATT8SCR - 100 )                )
+
+pivot_table_sorted_2 = pivot_table_2  %>%  arrange( desc( pivot_table_2$diff.relative.average.EXPP ) )       # Order by "diff.relative.average.EXPP"
+
+pivot_table_sorted_2
+```
+*Figure 1.4*
+
+From the above pivot table, that is sorted by the average EXPP of regions as a percentage of overall mean EXPP, we see that although North East has the lowest relative student performance it has the one of the highest relative EXPP by being 6.02% above regional average. In fact, none of the regions apart from London hold the same position that they previously did. South West and South East are spending 6.3% and 7.63% less than regional average. Other than that, there are no clear regional group trends based on the regions location.  
+
+Illustrating this in a bar plot:
+```{r}
+      # Prepare the data for the barplot:
+      # You need to run these commands to get the data into the correct format for the joint barplot
+
+data = data.frame(pivot_table_sorted_2$diff.relative.average.EXPP, pivot_table_sorted_2$diff.relative.average.ATT8SCR)
+rownames(data) = pivot_table_sorted_2$REGION
+data = t(data)
+
+      # Create the corresponding joint barplot
+      # Using "diff.relative.average.EXPP" and "diff.relative.average.ATT8SCR" from of the pivot table
+      # And the UK regions as the y axis:
+
+
+      par(mar = c(7, 20, 4, 4))                        # adjust the margins of the plot
+
+
+      barplot(  data,
+
+                 horiz = TRUE,                          # rotate the axes
+                  xlim = c(-15 , 25),
+                  main = "School Expenditure per Pupil and Student Performance by UK Region (2016-2017)",     # plot title
+                beside = TRUE,
+                  ylab = " ",
+                  xlab = "Deviations from the UK average (in %)",
+             names.arg = colnames(data), 
+             cex.names = 1,
+                   las = 2,                             # rotate the axis labels
+                   col = c("turquoise","purple"),
+                legend = c("School Expenditure per Pupil","Average Student Performance"),
+           args.legend = list(x = "right", bty = "n") )
+```
+
+Source: Own computation based on DfE (2018)
+*Figure 1.5*
+
+From the above barchart, it can be seen that only London and North East - the highest and lowest student performance respectively - are above average expenditure per pupil. 6 out of 9 regions' ATT8SCR and EXPP deviate from the UK average in the same direction. On the other end, the ones that have one negative and one positive deviation in each variable are North East, Yorkshire & Humberside and South East. Interestingly, the North East is the only one with a negative ATT8SCR and positive EXPP deviation percentage. These findings demonstrate that for two thirds of the regions the extent of regional inequalities in average student performance across secondary schools might be correlated with the available spending per pupil.
+
+Another variable of interest that I would like to see against ATT8SCR is RATPUPTEA, because I am intrigued to see the results.
+
+```{r}
+         # Create a joint pivot table with "ATT8SCR" and "RATPUPTEA" together:
+
+
+data_frame_3 = data.frame(URN, RATPUPTEA, ATT8SCR, REGION)
+
+
+
+pivot_table_3  =  data_frame %>% 
+
+                  group_by(   REGION   ) %>% 
+
+                 summarise(                        count = n(),                      
+                                         average.RATPUPTEA    = mean(RATPUPTEA),
+                                         average.ATT8SCR = mean(ATT8SCR) )   %>%    
+ 
+                    mutate(          
+                                   relative.average.RATPUPTEA = ( average.RATPUPTEA / mean(data_frame_3$RATPUPTEA) )*100,
+                              diff.relative.average.RATPUPTEA = ( relative.average.RATPUPTEA - 100 ),
+
+                                   relative.average.ATT8SCR = ( average.ATT8SCR / mean(data_frame_3$ATT8SCR) )*100,
+                              diff.relative.average.ATT8SCR = ( relative.average.ATT8SCR - 100 )                )
+
+      # Sort the pivot table
+      # Order the data by RATPUPTEA:
+
+pivot_table_sorted_3 = pivot_table_3  %>%  arrange( desc( pivot_table_3$diff.relative.average.RATPUPTEA ) )         
+
+
+pivot_table_sorted_3
+```
+*Figure 1.6*
+
+The above pivot table shows the 9 regions ordered by the deviation from the average RATPUPTEA in percentages. East Midlands and Yorkshire & Humberside lead by being 6.37% and 6.3% above average, 
+
+```{r}
+      # Prepare the data for the barplot:
+      # You need to run these commands to get the data into the correct format for the joint barplot
+
+data_2 = data.frame(pivot_table_sorted_3$diff.relative.average.RATPUPTEA, pivot_table_sorted_3$diff.relative.average.ATT8SCR)
+rownames(data_2) = pivot_table_sorted_3$REGION
+data_2 = t(data_2)
+  
+      # Create the corresponding joint barplot
+      # Using "diff.relative.average.RATPUPTEA" and "diff.relative.average.ATT8SCR" from of the pivot table
+      # And the UK regions as the y axis:
+
+
+      par(mar = c(7, 20, 4, 4))                        # adjust the margins of the plot
+
+
+      barplot(  data_2,
+
+                 horiz = TRUE,                          # rotate the axes
+                  xlim = c(-15 , 25),
+                  main = "Ratio of Pupils per Teacher and Student Performance by UK Region (2016-2017)",     # plot title
+                beside = TRUE,
+                  ylab = " ",
+                  xlab = "Deviations from the UK average (in %)",
+             names.arg = colnames(data_2), 
+             cex.names = 1,
+                   las = 2,                             # rotate the axis labels
+                   col = c("#669933","purple"),
+                legend = c("Average Number of Pupils per Teacher","Average Student Performance"),
+           args.legend = list(x = "right", bty = "n") )
+
+```
+
+Source: Own computation based on DfE (2018)
+*Figure 1.7*
+
+The barchart above shows that proportionately East Midlands, Yorkshire & Humberside and East of England are leading in terms of ratio of pupils per teacher. London and North East are the regions with the highest expenditure per pupil as seen above in Figure 1.5, however they are much more below than other regions in terms of RATPUPTEA. This also shows that EXPP is not necessarily spent on teachers. Once again the North is demonstrating aspects of regional inequalities with North East and North West being 5.27% and 2.84% below average for ATT8SCR & 6.55% and 1.99% below for RATPUPTEA. The data is split, with just over half of the RATPUPTEA bars moving in the same direction as the bars of ATT8SCR. 
+
+# Data Positioning
+
+Finally, to obtain a well-rounded understanding of extent of regional inequalities in average student performance across secondary schools, I will look more closely at how the statistics for each region behave.
+
+```{r}
+      # Recall previously constructed data frame:
+  
+
+            data_frame = data.frame(URN, ATT8SCR, REGION)  
+
+
+pivot_table_box  =  data_frame %>% 
+
+                  group_by(   REGION   ) %>% 
+
+                 summarise(                         count = n(),                      
+                                            average.ATT8SCR = mean(ATT8SCR), 
+                                        Bottom.1.percent = quantile(ATT8SCR, probs = 0.01, names = FALSE),
+                                        Bottom.20.percent = quantile(ATT8SCR, probs = 0.20, names = FALSE),
+                                        Bottom.25.percent = quantile(ATT8SCR, probs = 0.25, names = FALSE),
+                                                   Median = quantile(ATT8SCR, probs = 0.50, names = FALSE),
+                                        Bottom.75.percent = quantile(ATT8SCR, probs = 0.75, names = FALSE),          
+                                        Bottom.80.percent = quantile(ATT8SCR, probs = 0.80, names = FALSE), 
+                                        Bottom.99.percent = quantile(ATT8SCR, probs = 0.99, names = FALSE),
+                                     Inter.Quartile.Range = quantile(ATT8SCR, probs = 0.75, names = FALSE) - quantile(ATT8SCR, probs = 0.25, names = FALSE),
+                                              Ratio.80.20 = quantile(ATT8SCR, probs = 0.80, names = FALSE) / quantile(ATT8SCR, probs = 0.20, names = FALSE),
+                                     Top1.Bottom1.percent = quantile(ATT8SCR, probs = 0.99, names = FALSE) - quantile(ATT8SCR, probs = 0.01, names = FALSE)
+                            )   %>%    
+ 
+                    mutate(          
+                                   relative.average.ATT8SCR = ( average.ATT8SCR / mean(data_frame$ATT8SCR) )*100,
+                              diff.relative.average.ATT8SCR = relative.average.ATT8SCR - 100  )
+
+      # Sort the pivot table:
+      # Order = decreasing values of "diff.relative.average.Variable"
+
+pivot_table_box_sorted = pivot_table_box  %>%  arrange( desc( pivot_table_box$diff.relative.average.ATT8SCR ) )
+
+pivot_table_box_sorted
+```
+*Figure 1.8*
+
+From the above pivot table, it can be seen that the typical score in England ranges from 43.1 to 48.8 across the regions. The regions with the lowest score for the bottom 25% of schools in that region are North West and West Midlands. In this case, it means that the top 75% schools in those regions have an ATT8SCR of more than 41. South East has the second largest average with ATT8SCR 47.25, the middle 50% of schools in South East have a score between 41.475 and 51.725. Thus, it has the largest interquartile range which is 10.25, suggesting that the region has a wide amount of spread in the middle half of the data. 
+In the table, the 80/20 ratio shows how many times the ATT8SCR of the bottom 20% can fit into the score of the top 20%. This ratio ranges from 1.14 to 1.29 times across regions, showing that there is not an excessive difference between the two groups.
+
+Another column of interest is the 'Top1.Bottom1.percent' one which shows the gap between the top 1% and bottom 1%. In other words, it can be seen as illustrating the gap between the ATT8SCR of the 99th percentile and 1st percentile. East of England has the lowest number with 21.187 meaning that the region's scores are less spread. It is likely to have less outliers than a region like London, where the gap between higher and slowest (subjectively chosen in this case to be determined by 1%) is 40.560. 
+
+Overall, the **
+
+!review and do more comparing! L vs NE
+
+## Evolution Through Time
+
+What has been the recent evolution of income inequality within local authorities where schools with highest and lowest student performance are located?
