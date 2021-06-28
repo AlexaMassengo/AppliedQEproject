@@ -29,7 +29,7 @@ Statistical analysis might highlight a number of things including: which regions
 
 The dataset used in this project was sourced from UK Department for Education's (DfE) publication of 'Secondary school performance tables in England: 2017', and it contains the revised key stage 4 results for academic year 2016/17, including general school information, student performance and school workforce and finance for (publicly maintained) schools in England. The size of the sample is 758 schools.
 
-The database contains a total of 29 variables detailing particular characteristics for each school such as: school unique reference number (URN), school name (SCHNAME), income per pupil (INCP) and number of full-time equivalent pupils (PUP).
+The database contains a total of 29 variables detailing particular characteristics for each school such as: school unique reference number (URN), school name (SCHNAME), local authority (LANAME), income per pupil (INCP) and number of full-time equivalent pupils (PUP).
 
 The data also includes the average Attainment 8 score per pupil (ATT8SCR). On its own it is an indicator of a student's performance level between 8 subjects including Mathematics and English which are both weighted. In the case of the data, this individual score has been average with that of other schoolmates. Another variables of interest when targeting this research question include: region in England (REGION), number of pupils at the end of key stage 4 (PUPKS4), pupil to teacher ratio (RATPUPTEA), median gross weekly pay in the Local Authority (LAPAY), expenditure in learning resources per pupil (EXPLRESP) and percentage of overall expenditure spent in learning resources (SHEXPLRES). **
 
@@ -77,7 +77,14 @@ pivot_table_sorted = pivot_table  %>%  arrange( desc( pivot_table$diff.relative.
 
 pivot_table_sorted
 ```
+
 *Figure 1.1*
+*References:*
+- Count: Number of schools in the sample for each region
+- average.ATT8SCR: Average Attainment 8 score 
+- relative.average.ATT8SCR: Regional Attainment 8 score expressed as a proportion of national average (in %)
+- diff.relative.average.ATT8SCR: Regional difference with respect to national average (in percentage points)
+Source: Own computation based on DfE (2018)
 
 In the above table, 'average.ATT8SCR' is the regional average Attainment 9 score for each region in its corresponding row. The range between the highest and lowest performing regions, London and North East, is `r 49.03475-44.03077` points. The relative average deviation illustrated as the 'diff.relative.average.ATT8SCR' column, shows that out of the 9 regions London is over-performing by a marginally larger percentage point of 5.5 (rounded up) than the national average.
 
@@ -222,7 +229,7 @@ data = t(data)
 Source: Own computation based on DfE (2018)
 *Figure 1.5*
 
-From the above barchart, it can be seen that only London and North East - the highest and lowest student performance respectively - are above average expenditure per pupil. 6 out of 9 regions' ATT8SCR and EXPP deviate from the UK average in the same direction. On the other end, the ones that have one negative and one positive deviation in each variable are North East, Yorkshire & Humberside and South East. Interestingly, the North East is the only one with a negative ATT8SCR and positive EXPP deviation percentage. These findings demonstrate that for two thirds of the regions the extent of regional inequalities in average student performance across secondary schools might be correlated with the available spending per pupil.
+From the above barchart, it can be seen that only London and North East - the highest and lowest student performance respectively - are above average expenditure per pupil. 6 out of 9 regions' ATT8SCR and EXPP deviate from the UK average in the same direction. On the other hand, the ones that have one negative and one positive deviation in each variable are North East, Yorkshire & Humberside and South East. Interestingly, the North East is the only one with a negative ATT8SCR and positive EXPP deviation percentage. These findings demonstrate that for two thirds of the regions the extent of regional inequalities in average student performance across secondary schools might be correlated with the available spending per pupil.
 
 Another variable of interest that I would like to see against ATT8SCR is RATPUPTEA, because I am intrigued to see the results.
 
@@ -352,4 +359,104 @@ Overall, the **
 
 ## Evolution Through Time
 
-What has been the recent evolution of income inequality within local authorities where schools with highest and lowest student performance are located?
+Moving onto the second part of the project, I will be looking at what has been the recent evolution of income inequality within local authorities where schools with highest and lowest student performance are located. In order to do this, I will conduct a time series analysis. Firstly, I will identify the local authority with the lowest and highest student performance. This differs from the analysis in the previous section, where I was looking at the variable REGION rather than school local authority (LANAME) which describes which borough the school is in within that region. 
+
+```{r}
+         # Sort "AppQE_project_sample" according to column ATT8SCR, from largest to smallest
+Sorted_by_Performance = AppQE_project_sample  %>%  arrange( desc( AppQE_project_sample$ATT8SCR ) )      
+
+         # Looking at the top 20
+top_n(Sorted_by_Performance, 20, ATT8SCR)
+```
+*Figure 2.1*
+
+Looking at the top 20 schools in terms of school performance, it can be seen that majority of them are grammar schools - where pupils are admitted on the basis of ability. This is intriguing and would have certainly been an interesting thing to analyse if the data contained a variable to decipher between non-selective and selective schools. Nevertheless, focusing on the question at hand, the mode local authority in the top 20 is Kent. Kent is in the South East region, where the ATT8SCR is 1.66 percentage points above nation average.
+
+```{r}
+         # Looking at the bottom 20
+top_n(Sorted_by_Performance, -20, ATT8SCR)
+```
+*Figure 2.2*
+
+The bottom 20 are all mixed schools, majority of which appear to be located in the North West region. Rochdale and Cumbria both appear twice, but since Cumbria has a lower position in each pages of rows (1-10 vs 11-20) I have choosen that to identify it as the local authority with the lowest ATT8SCR.
+
+```{r}
+         # Detaching the previous data frame to
+detach(AppQE_project_sample) 
+```
+
+
+```{r}
+
+         # To plot the evolution of income inequality within local authorities where schools 
+         # with highest and lowest student performance are located, we need the Excel file "AppQE_TS_project_02.xlsx"
+
+
+         # Load the data from Excel:
+
+AppQE_TS_project_02 = read_excel("~/Documents/University/Applied QE/AppQE_TS_project_02.xlsx", sheet="Data_for_R")
+attach(AppQE_TS_project_02)
+
+
+         # Identify the rows for Kent and Cumbria:
+
+   Kent_data = filter(AppQE_TS_project_02, LANAME=="Kent")
+Cumbria_data = filter(AppQE_TS_project_02, LANAME=="Cumbria")
+
+
+         # Extract the values of the 80/20 ratios for "Kent" and "Cumbria": 
+
+   Kent_80_20_ratio = t( Kent_data[1,3:12]    )
+Cumbria_80_20_ratio = t( Cumbria_data[1,3:12] )
+
+
+         # Transform these series into time series objects from 2008 to 2017:
+
+ 
+   Kent_80_20_ratio = ts(    Kent_80_20_ratio,  start=2008,  frequency=1)
+Cumbria_80_20_ratio = ts( Cumbria_80_20_ratio,  start=2008,  frequency=1) 
+
+
+
+         # Plot these two series together:
+
+
+    plot(Kent_80_20_ratio, 
+                                        col = "#b69049",   
+                                        lwd = 3, 
+                                       xlab = "Year", 
+                                       ylab = "80-to-20 Ratio", 
+                                       main = "Evolution of the 80/20 ratio in the local authorities with the highest and lowest student performance in the UK (2008-2017)",
+                                       ylim = c(2.20 , 2.50))
+
+        lines(Cumbria_80_20_ratio,    
+                                        col = "#496FB6", 
+                                        lwd = 3)
+                        
+        legend("bottomleft", inset=.02,
+          legend    = c( "Kent",        "Cumbria"                ),
+          col       = c( "#b69049",        "#496FB6"             ),
+          lty       = c( "solid",       "solid"                  ),
+          cex       = 1.1,
+          text.font = 2, 
+          bg        = "white",
+          bty       = "n")
+```
+
+Source: Own computation based on DfE (2018)
+*Figure 2.3*
+
+The above linechart is a time series that shows the evolution of the 80/20 ratio in Kent and Cumbria from 2008 to 2017. The ratio is representative for gross weekly pay inequality. Using this ratio is effective because it demonstrates how many times the 20th percentiles' gross weekly pay can go into the 80th percentiles'. If I was using real values instead it would be hard to highlight inequality, because one local authority might be more affluent than the other. Time series analysis will be useful to see changes on time between the local authorities with the highest and lowest student performance. 
+
+Looking at the graph, over those years Kent's 80/20 ratio is above Cumbria until 2015. From 2008 to 2011, they follow the same evolution starting with Kent's ratio at 2.44 and Cumbria's 0.08 below that. The next year, 2009, we see a 0.07 dip in income inequality which questionably might have to do with the financial crisis. From then, the 80/20 ratios began to peak to the highest point over that spam of years for both local authorities. In 2011, the ratios were 2.47 for Kent and 2.4 for Cumbria, this represent roughly a 4.4% and 4.34% growth respectively from 2009. In 2012, ratios for both local authorities dropped back to 2008 and 2010's figures. In 2013, we see a drastic drop in wage inequality for Cumbria as the ratio drops to 2.22 while Kent's evolution does not differ much from the previous year. Nevertheless, the following year Cumbria's 80/20 ratio jumped back to 2.35. From then to 3 years later in 2017, it grew slowly to around 2.38. Kent, on the other hand, saw decreasing inequality from 2014 that led to 2.27 - its lowest ratio of the period. At this point, we see a switch between the two as the local authority with the highest student performance now has less pay disparities than the one with the lowest student performance. The time series ends in 2017 with Cumbria's ratio on 2.4 and Kent's on 2.33. 
+
+Overall, commenting on the 
+
+
+
+
+
+
+
+
+
