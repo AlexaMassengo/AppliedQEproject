@@ -1,0 +1,96 @@
+---
+title: "Applied QE Project"
+author: 'Alexa Massengo - Student ID: 33640362'
+date: "19/06/2021"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+## R Markdown
+
+This is an R Markdown document that contains `r wordcountaddin::word_count()` words, excluding the code chunk.
+
+In order to obtain the above information, I ran the following:
+```{install.packages('devtools') include=FALSE}
+devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)}
+1
+```
+
+## Introduction
+
+The aim of this project is to highlight regional inequalities and determinants of secondary school student performance in England. In order to tackle this research question, I will answering numerous questions, whereby analysing what factors have a different effect on secondary school student performance in England. The key measurement of performance will be the Attainment 8 Score of pupil in Key Stage 4, a stage of education that occurs typically when pupils are aged 14 to 16. 
+
+Statistical analysis might highlight a number of things including: which regions are suffering the most and possible reasons why, and how determinants such as the environment students are in affects performance. Seeing that a student's performance might have a significance in determining their chances of pursuing further education and what profession they end up doing, breaking down the possible determinants of student achievement in exams at this age is extremely important and telling. This project is an important start to assessing the economic benefits of education as a whole, which reconciles microeconomic and macroeconomic approaches. In terms of microeconomic theory, there is an opportunity cost of pursuing further education which compares the monetary gains made as a school leaver, versus that of somebody that has access to higher paying careers due to having pursued further education. This is an interesting phenomena which carries into macroeconomic theory, where education is seen as a factor of long-run economic growth and stock of human capital is crucial in determining income growth. **
+
+## Dataset Characteristics
+
+The dataset used in this project was sourced from UK Department for Education's (DfE) publication of 'Secondary school performance tables in England: 2017', and it contains the revised key stage 4 results for academic year 2016/17, including general school information, student performance and school workforce and finance for (publicly maintained) schools in England. The size of the sample is 758 schools.
+
+The database contains a total of 29 variables detailing particular characteristics for each school such as: school unique reference number (URN), school name (SCHNAME), income per pupil (INCP) and number of full-time equivalent pupils (PUP).
+
+The data also includes the average Attainment 8 score per pupil (ATT8SCR). On its own it is an indicator of a student's performance level between 8 subjects including Mathematics and English which are both weighted. In the case of the data, this individual score has been average with that of other schoolmates. Another variables of interest when targeting this research question include: region in England (REGION), number of pupils at the end of key stage 4 (PUPKS4), pupil to teacher ratio (RATPUPTEA), median gross weekly pay in the Local Authority (LAPAY), expenditure in learning resources per pupil (EXPLRESP) and percentage of overall expenditure spent in learning resources (SHEXPLRES). **
+
+## Regional Inequalities
+
+By closing observing some variables against the different regions of England, the extent of regional inequalities in average student performance across secondary schools will be more clear. 
+
+Additionally, I need to load the following packages:
+```{r}
+library(readxl)
+library(magrittr)
+library(rpivotTable)
+library(dplyr)
+library(ggplot2) 
+library(sjPlot)
+library(tidyr)
+```
+
+
+# One Variable Analysis
+
+Firstly, in order to gauge the performance across different regions of England I will use the ATT8SCR variable to complete an one variable analysis.
+
+```{r}
+         # Load the data from Excel into R:
+
+            AppQE_project_sample = read_excel("~/Documents/University/Applied QE/AppQE_project_sample - Full Sample (758 schools).xlsx")
+            View(AppQE_project_sample)
+            attach(AppQE_project_sample)
+
+         # Second, construct the data frame:
+
+            data_frame = data.frame(URN, ATT8SCR, REGION)  
+
+         # Pivot table with: rows = UK regions
+
+
+pivot_table  =  data_frame %>% 
+
+                  group_by(   REGION   ) %>% 
+
+                 summarise(  count = n(),                      
+                             average.ATT8SCR = mean(ATT8SCR) )   %>%    
+ 
+                    mutate(  relative.average.ATT8SCR = ( average.ATT8SCR / mean(data_frame$ATT8SCR) )*100,
+                             diff.relative.average.ATT8SCR = relative.average.ATT8SCR - 100  )
+
+      # Sort the pivot table:
+      # Order by "diff.relative.average.ATT8SCR"
+
+
+pivot_table_sorted = pivot_table  %>%  arrange( desc( pivot_table$diff.relative.average.ATT8SCR ) )
+
+pivot_table_sorted
+View(pivot_table_sorted)
+```
+_Table 1_
+
+Ideas:
+REGION, ATT8SCR, EXPP
+REGION, ATT8SCR, RATPUPTEA
+REGION, SHEXPLRES, does it correlate with ATT8SCR - scatterplot
+
+
