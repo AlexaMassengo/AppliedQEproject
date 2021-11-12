@@ -3,8 +3,8 @@ title: "Applied QE Project"
 author: 'Alexa Massengo - Student ID: 33640362'
 date: "19/06/2021"
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document:
     df_print: paged
 ---
@@ -19,11 +19,13 @@ devtools::install_github("benmarwick/wordcountaddin", type = "source", dependenc
 1
 ```
 
+
 ## Introduction
 
 The aim of this project is to highlight regional inequalities and determinants of secondary school student performance in England. In order to tackle this research question, I will answering numerous questions, whereby analysing what factors have a different effect on secondary school student performance in England. The key measurement of performance will be the Attainment 8 Score of pupil in Key Stage 4, a stage of education that occurs typically when pupils are aged 14 to 16. 
 
 Statistical analysis might highlight a number of things including: which regions are suffering the most and possible reasons why, and how determinants such as the environment students are in affects performance. Seeing that a student's performance might have a significance in determining their chances of pursuing further education and what profession they end up doing, breaking down the possible determinants of student achievement in exams at this age is extremely important and telling. This project is an important start to assessing the economic benefits of education as a whole, which reconciles microeconomic and macroeconomic approaches. In terms of microeconomic theory, there is an opportunity cost of pursuing further education which compares the monetary gains made as a school leaver, versus that of somebody that has access to higher paying careers due to having pursued further education. This is an interesting phenomena which carries into macroeconomic theory, where education is seen as a factor of long-run economic growth and stock of human capital is crucial in determining income growth. **
+
 
 ## Dataset Characteristics
 
@@ -32,6 +34,7 @@ The dataset used in this project was sourced from UK Department for Education's 
 The database contains a total of 29 variables detailing particular characteristics for each school such as: school unique reference number (URN), school name (SCHNAME), local authority (LANAME), income per pupil (INCP) and number of full-time equivalent pupils (PUP).
 
 The data also includes the average Attainment 8 score per pupil (ATT8SCR). On its own it is an indicator of a student's performance level between 8 subjects including Mathematics and English which are both weighted. In the case of the data, this individual score has been average with that of other schoolmates. Another variables of interest when targeting this research question include: region in England (REGION), number of pupils at the end of key stage 4 (PUPKS4), pupil to teacher ratio (RATPUPTEA), median gross weekly pay in the Local Authority (LAPAY), expenditure in learning resources per pupil (EXPLRESP) and percentage of overall expenditure spent in learning resources (SHEXPLRES). **
+
 
 ## Regional Inequalities
 
@@ -110,8 +113,8 @@ pivot_table_sorted_bar = pivot_table[order(pivot_table$diff.relative.average.ATT
 
 ```
 
-Source: Own computation based on DfE (2018)
-*Figure 1.2*
+*Figure 1.2* | Source: Own computation based on DfE (2018)
+
 
 Looking at the above bar chart, there is some possible grouping of close regions of England with similar patterns. Based on the sample, the North is the worst performing. London and South East are above average, but nevertheless the neighbouring East of England is below by around 2 points. 
 
@@ -143,8 +146,8 @@ par(mfrow = c(1, 2))
                                freq = FALSE )
 ```
 
-Source: Own computation based on DfE (2018)
-*Figure 1.3*
+*Figure 1.3* | Source: Own computation based on DfE (2018)
+
 
 ```{r}
 median(region_1$ATT8SCR)
@@ -207,7 +210,7 @@ data = t(data)
       # And the UK regions as the y axis:
 
 
-      par(mar = c(7, 20, 4, 4))                        # adjust the margins of the plot
+      par(mar = c(7, 15, 4, 4))                        # adjust the margins of the plot
 
 
       barplot(  data,
@@ -226,8 +229,8 @@ data = t(data)
            args.legend = list(x = "right", bty = "n") )
 ```
 
-Source: Own computation based on DfE (2018)
-*Figure 1.5*
+*Figure 1.5* | Source: Own computation based on DfE (2018)
+
 
 From the above barchart, it can be seen that only London and North East - the highest and lowest student performance respectively - are above average expenditure per pupil. 6 out of 9 regions' ATT8SCR and EXPP deviate from the UK average in the same direction. On the other hand, the ones that have one negative and one positive deviation in each variable are North East, Yorkshire & Humberside and South East. Interestingly, the North East is the only one with a negative ATT8SCR and positive EXPP deviation percentage. These findings demonstrate that for two thirds of the regions the extent of regional inequalities in average student performance across secondary schools might be correlated with the available spending per pupil.
 
@@ -241,7 +244,7 @@ data_frame_3 = data.frame(URN, RATPUPTEA, ATT8SCR, REGION)
 
 
 
-pivot_table_3  =  data_frame %>% 
+pivot_table_3  =  data_frame_3 %>% 
 
                   group_by(   REGION   ) %>% 
 
@@ -266,7 +269,7 @@ pivot_table_sorted_3
 ```
 *Figure 1.6*
 
-The above pivot table shows the 9 regions ordered by the deviation from the average RATPUPTEA in percentages. East Midlands and Yorkshire & Humberside lead by being 6.37% and 6.3% above average, 
+The above pivot table shows the 9 regions ordered by the deviation from the average RATPUPTEA in percentages. East Midlands and Yorkshire & Humberside lead by being 6.37% and 6.3% above average, respectively.
 
 ```{r}
       # Prepare the data for the barplot:
@@ -281,13 +284,13 @@ data_2 = t(data_2)
       # And the UK regions as the y axis:
 
 
-      par(mar = c(7, 20, 4, 4))                        # adjust the margins of the plot
+      par(mar = c(5,15,4,4))                        # adjust the margins of the plot
 
 
       barplot(  data_2,
 
                  horiz = TRUE,                          # rotate the axes
-                  xlim = c(-15 , 25),
+                  xlim = c(-8 , 8),
                   main = "Ratio of Pupils per Teacher and Student Performance by UK Region (2016-2017)",     # plot title
                 beside = TRUE,
                   ylab = " ",
@@ -301,8 +304,7 @@ data_2 = t(data_2)
 
 ```
 
-Source: Own computation based on DfE (2018)
-*Figure 1.7*
+*Figure 1.7* | Source: Own computation based on DfE (2018)
 
 The barchart above shows that proportionately East Midlands, Yorkshire & Humberside and East of England are leading in terms of ratio of pupils per teacher. London and North East are the regions with the highest expenditure per pupil as seen above in Figure 1.5, however they are much more below than other regions in terms of RATPUPTEA. This also shows that EXPP is not necessarily spent on teachers. Once again the North is demonstrating aspects of regional inequalities with North East and North West being 5.27% and 2.84% below average for ATT8SCR & 6.55% and 1.99% below for RATPUPTEA. The data is split, with just over half of the RATPUPTEA bars moving in the same direction as the bars of ATT8SCR. 
 
@@ -356,6 +358,7 @@ Another column of interest is the 'Top1.Bottom1.percent' one which shows the gap
 Overall, the **
 
 !review and do more comparing! L vs NE
+
 
 ## Evolution Through Time
 
@@ -443,20 +446,307 @@ Cumbria_80_20_ratio = ts( Cumbria_80_20_ratio,  start=2008,  frequency=1)
           bty       = "n")
 ```
 
-Source: Own computation based on DfE (2018)
-*Figure 2.3*
+*Figure 2.3* | Source: Own computation based on DfE (2018)
+
 
 The above linechart is a time series that shows the evolution of the 80/20 ratio in Kent and Cumbria from 2008 to 2017. The ratio is representative for gross weekly pay inequality. Using this ratio is effective because it demonstrates how many times the 20th percentiles' gross weekly pay can go into the 80th percentiles'. If I was using real values instead it would be hard to highlight inequality, because one local authority might be more affluent than the other. Time series analysis will be useful to see changes on time between the local authorities with the highest and lowest student performance. 
 
 Looking at the graph, over those years Kent's 80/20 ratio is above Cumbria until 2015. From 2008 to 2011, they follow the same evolution starting with Kent's ratio at 2.44 and Cumbria's 0.08 below that. The next year, 2009, we see a 0.07 dip in income inequality which questionably might have to do with the financial crisis. From then, the 80/20 ratios began to peak to the highest point over that spam of years for both local authorities. In 2011, the ratios were 2.47 for Kent and 2.4 for Cumbria, this represent roughly a 4.4% and 4.34% growth respectively from 2009. In 2012, ratios for both local authorities dropped back to 2008 and 2010's figures. In 2013, we see a drastic drop in wage inequality for Cumbria as the ratio drops to 2.22 while Kent's evolution does not differ much from the previous year. Nevertheless, the following year Cumbria's 80/20 ratio jumped back to 2.35. From then to 3 years later in 2017, it grew slowly to around 2.38. Kent, on the other hand, saw decreasing inequality from 2014 that led to 2.27 - its lowest ratio of the period. At this point, we see a switch between the two as the local authority with the highest student performance now has less pay disparities than the one with the lowest student performance. The time series ends in 2017 with Cumbria's ratio on 2.4 and Kent's on 2.33. 
 
-Overall, commenting on the 
+Overall, there are a few key takeaways from looking closely at the evolution of income inequality within local authorities where schools with highest and lowest student performance are located. Kent's 80/20 ratio ranges from 2.27 to 2.47, while Cumbria's ranges from 2.22 to 2.4. This showcases that there is no large difference in income inequality between local authorities. Nevertheless, the recent evolution of income inequality illustrates that Kent still outperformed Cumbria even when its 80/20 ratio was lower in the academic years of the sample.
+
+
+## Regression Analysis
+
+The third part of this project consists of looking at what are the factors associated with higher average student performance. Having looked at regional inequalities and local income inequalities in the previous sections, this part will focus on looking at the correlation of some of the other 24 descriptive variables in the data against ATT8SCR. 
+
+Using a method from statistic inference called Ordinary Least Squares (OLS) regression can provide a way of estimating determinants of student performance. This is because the regression coefficient **β~1~** which measures the predicted change in Y per unit change in X is closely related to the correlation coefficient rxy. Using the OLS method, we are able to get an estimate of the regression model which has **Y~i~** = **β~0~** + **β~1~****X~i~** + **ε~i~** as the population regression equation describing the relationship between variables. The fitted model associated to this estimation, $\bar{Y}$i = **b~0~** + **b~1~****X~i~**, gives two coefficient estimates **b~0~** and **b~1~**. **b~0~** is like the 'c' in a straight line, it is the intercept coefficient which accounts for the predicted value of **Y~i~** when **X~i~** is 0. **b~1** is the slope coefficient, which tells us the the predicted change in **Y~i~** per unit change in **X~i~**.
+
+# Simple Linear Regression
+
+Starting with a simple linear regression, I will be looking at ATT8SCR as the dependent variable and percentage of students eligible for Free School Meals (PFSM) as the independent variable to gauge the correlation between the two. This is because I am interested in social mobility and have an hypothesis that being from a less financial privileged background can affect an individual's school performance negatively. Economic hardship might lead to less support at home, impeding pupils’ possibilities to focus on their studies. Seeing as PFSM is an indirect indicator of the relative poverty of the student's households at that given school, regressing ATT8SCR on PFSM will shed light on this hypothesis. 
+
+```{r}
+         # Load the data from Excel into R:
+
+detach(AppQE_TS_project_02)
+attach(AppQE_project_sample)
+
+regression = lm(ATT8SCR ~ PFSM)     # run the regression
+
+regression                          # display the output from the regression
+summary(regression)                 # displayed the detailed output
+```
+
+*Figure 3.1* | Source: Own computation based on DfE (2018)
+
+
+According to the table, there is a negative linear association between the percentage of pupils eligible for free school meals and educational attainment. This means that the higher the percentage of students who require free school meals the lower the (average) student performance observed. From the above, I can formulate the fitted regression which can be written as Yi = 51.41 - 0.337Xi. The intercept b0 stands for the value of average Attainment 8 score when the percentage of students getting free school meals is at 0. In this case, ATT8SCR is at 51.4127 when PFSM is at 0. The direction of the slope and coefficient b1 tells us that an increase of 1 percentage point of PFSM results in a 0.3372 decrease in ATT8SCR. Thus, an increase of 10 percentage points in pupils eligible for free school meals is associated with a decrease of 3.4 points (rounded) in average student attainment 8 score.
+
+```{r}
+residuals = residuals(regression)   # save the residuals from the regression
+    y.hat = predict(regression)     # predicted values by the regression, given the explanatory variable
+
+
+confint(regression, level=0.90)     # 10% confidence intervals for the estimated coefficients
+confint(regression, level=0.95)     #  5% confidence intervals for the estimated coefficients
+confint(regression, level=0.99)     #  1% confidence intervals for the estimated coefficients
+```
+
+*Figure 3.2* | Source: Own computation based on DfE (2018)
+
+
+Evaluating the linear regression model at a 10% confidence intervals for the estimated coefficients highlights a range of values likely to include the true school population value. In this case, the average Attainment 8 score of the schools is at least 50.78 and at most 52.05. In terms of the slope coefficient, an increase of 10 percentage points in pupils eligible for free school meals is associated with a decrease of 3 to 3.73 points in average student attainment 8 score. The gap between upper and lower boundaries for the coefficients widen as the significance levels lower, because we want to be more confident that the population value lies within that range. In the regression above, the t-statistics gives a p-value of 2.2e-16 which is extremely close to 0. Whereby this shows that the marginal effect of PFSM on ATT8SCR is statistically significant at a 5% significance level.
+
+
+```{r}
+      # Plot the regression line together with the scatter plot of the data:
+
+plot(ATT8SCR ~ PFSM,                                   # Scatter plot of the data
+                   main = "ATT8SCR against PFSM",
+                   xlab = "PFSM",
+                   ylab = "ATT8SCR",
+                    col = "lightblue",
+                    pch = 20 )
+
+    abline(lm(ATT8SCR ~ PFSM),  col="darkorange",  lwd=3 )    # Regression line (linear model)
+    lines(lowess(PFSM,ATT8SCR), col="black",       lwd=3 )    # Lowess line (nonlinear model)
+```
+
+*Figure 3.3* | Source: Own computation based on DfE (2018)
+
+Plotting the regression gives a visual representation of the negative correlation between ATT8SCR and PFSM. It can be seen that as PFSM increase, ATT8SCR decreases. Although the slope is not that steep, it still indicates the way the two variables are linked. The black line is the Lowess line which is the non-linear model and the orange one is the linear model. The blue dots in the scatter graph are the residuals which represent deviations from the sample mean. The gap between the  population regression equation and the fitted model is the residual *ε~i~. They are the state of reality that my model cannot explain thus we aim to minimise them to maximise the accuracy of the model.
+
+```{r}
+      # Plot the residuals from the regression:
+
+  par(mfrow = c(1, 2))
+      plot( residuals, pch = 21 )            # Plot the residuals
+      abline( h=0, col="red" )               # Add a horizontal red line at 0
+      hist( residuals, col="orange")         # Plot the histogram of the residuals: Are the residuals normally distributed?
+```
+
+*Figure 3.4* | Source: Own computation based on DfE (2018)
+
+When plotted by themselves, it can be seen that the residuals are numerous. They range between -20 and 30 with majority of them being clustered between -10 and 10. Judging from the scatter plot, it appears that there are a few more a few residuals near 30, meaning that the model is underestimating the actual value of Yi. Nevertheless, the fact that the histogram is right skewed highlights the high frequency of residuals in the lower end of the range. Specifically, the cluster rightfully represents itself with -10 to 0 being the highest frequency.
+
+```{r}
+      # Create a pivot table with UK regions in rows and the variables' averages in columns
+      # But before we create the pivot table we need to create the data frame just like in Excel:
+
+
+data_frame_4 = data.frame( URN, REGION, PFSM, ATT8SCR, y.hat, residuals)     # Exactly like the Excel spreadsheet in slide 8 of lecture 2
+
+
+
+
+      # Now we can create the pivot table with the averages of each variable by UK region:
+
+
+
+pivot_table_4  =  data_frame_4 %>% 
+
+                  group_by(   REGION   ) %>% 
+
+                 summarise(   count              = n(),                      
+                              average.PFSM       = mean(PFSM), 
+                              average.ATT8SCR    = mean(ATT8SCR), 
+                              average.y.hat      = mean(y.hat), 
+                              average.residuals  = mean(residuals)  )
 
 
 
 
 
 
+      # Sort the pivot table:
+      # Order = decreasing values of "average.residuals"
 
 
+pivot_table_sorted_4 = pivot_table_4  %>%  arrange( desc( pivot_table_4$average.residuals ) )
+
+pivot_table_sorted_4
+```
+
+*Figure 3.5* | Source: Own computation based on DfE (2018)
+
+
+
+```{r}
+     # We are now ready to plot the average residuals by UK region:
+     # Using "ggplot"
+
+
+ggplot(pivot_table_sorted_4, aes( x = reorder(REGION, average.residuals), y = average.residuals)) +
+  geom_bar(stat="identity", colour="skyblue", fill="steelblue") +
+  coord_flip() +
+  ggtitle("ATT8SCR Residual by UK Region as predicted by PFSM") +
+  labs(y=" ", x="UK Region", caption="Source: Author's own computations")
+```
+
+*Figure 3.6* | Source: Own computation based on DfE (2018)
+
+The above bar chart shows the regional over/under-performance predicted by PFSM in ATT8SCR points. The pivot table contains average ATT8SCR, the average predicted values by the regression given the explanatory variable, known as 'average y hat', and the average of the residuals per region. As seen in the barchart, London is the only region overperforming what it is predicted according to PFSM. Examining the London row, it can be seen that regardless of the fact that its regional average percentage of students on free school meals is 19.58% and therefore the highest in the country, the  average student attainment 8 score is roughly 10% higher than what would predicted by its relatively high PFSM. Some of the other regions underperform in regional subgroups in the following order from best to worst: Midlands, Yorkshire, North of England, South of England and East of England. 
+
+
+# Multiple Linear Regression
+
+There are a few more variable whose relationship with ATT8SCR I have deemed as important. 
+The first is median gross weekly pay in local authority per week (LAPAY) for similar reasons that I chose PFSM - they both show relative poverty. I expect it to have a positive correlation with ATT8SCR, because although it is not directly telling us about the financial situation of students at that school, it does report on the area the school is in. 
+The second variable is the ratio of pupils per teacher (RATPUPTEA). Seeing that having less pupils in the classroom means that a teacher might be able to devote more 1-on-1 time with pupils struggling, I would expect this variable to have a positive correlation with ATT8SCR.
+Considering that English is one of the double-weight grades that contributes to the Attainment 8 score, it might be expected that schools with a higher percentage of pupils with English as their first language (PENGFL) would have a higher score.
+Finally, the last variable is the percentage share of school expenditure spent on learning resources (SHEXPLRES). I expect that the higher this share is, the more the average student could be engaged in learning and therefore their Attainment 8 score should reflect that positive impact.
+
+```{r}
+        # Project 2 - Regressions:
+
+multiple.regression.4 = lm( ATT8SCR ~ PFSM + LAPAY                                  ,  data = data_frame)
+multiple.regression.5 = lm( ATT8SCR ~ PFSM + LAPAY + RATPUPTEA + PENGFL             ,  data = data_frame)
+multiple.regression.6 = lm( ATT8SCR ~ PFSM + LAPAY + RATPUPTEA + PENGFL + SHEXPLRES ,  data = data_frame)
+
+   
+
+        # Compare the results of the regressions:
+        # The "tab_model()" function will open the results on your internet browser
+        # More information here: https://www.rdocumentation.org/packages/sjPlot/versions/2.8.7/topics/tab_model
+
+
+
+tab_model(   
+             multiple.regression.4,
+             multiple.regression.5,
+             multiple.regression.6,
+
+                show.ci = 0.95, 
+            collapse.ci = TRUE,
+            collapse.se = TRUE,
+                p.style = "stars",
+                show.se = TRUE,
+             show.fstat = TRUE,
+               show.aic = TRUE,
+                 digits = 2  )
+```
+
+*Figure 3.7* external | Source: Own computation based on DfE (2018)
+
+The table inserted above shows the coefficient estimates, with the 95% confidence interval range and standard error below it. All variables in the three models are statistically significant at the 0.1% level, with the exception of RATPUPTEA which is statistically significant at the 1% level in the third model. Focusing on the first column containing just the relative poverty variables, a school with an additional 10 percentage points in the share of pupils eligible for free meals assistance is associated with a student underperformance of 3.4 points, ceteris paribus. Whereas a similar school in terms of free school meals — but located in an area with an additional median gross weekly income of £100 — would tend to be associated with an improvement of student performance of 2 points.
+
+Moving onto the second column it can be seen that the coefficient estimate for RATPUPTEA is positive, which debuts my a prior assumption that having more pupils per teacher would lead to a lower ATT8SCR. This multiple regression model shows that an additional unit in the pupil/teacher ratio amounts to 0.39 score point increase. Reasons for this might be that it is about the teacher's ability to teach the class well as a whole rather than 1-on-1, and having more pupils in the class might aide in facilitating a better working environment. 
+
+Having a higher level of pupils whose mother tongue is English comes with an underperformance in ATT8SCR by 0.6 score points per additional 10 percentage points, holding all other variables constant. This coefficient suggests that cultural and linguistic diversity is is positively associated to better student performance. 
+
+Lastly, ATT8SCR increases by 0.6 per additional percentage point spent in learning resources. Looking at the R^2 coefficients between models, it can be seen that by considering other variables additional to the relative poverty one, we are able to increase the percentage of the total variation in student performance explained by our fitted model from 27.7% to 34.9%.
+
+
+# Multiple Linear Regression with Dummies
+
+```{r}
+
+      # DMIXED and DLONDON are dummy variables (either 0 or 1), a.k.a categorical variables.
+      # Dummy variables require special treatment in R.
+      # We need to tell R that DMIXED and DLONDON are dummy variables (or "factors"):
+
+
+DMIXED  =  as.factor(DMIXED) 
+DLONDON =  as.factor(DLONDON)
+
+
+
+     # Create our data frame by adding the necessary variables.
+     # We will use the same data frame for both projects 1 and 2.
+     # The function "scale()" generates a standardized data frame.
+     # The scaled data frame includes all variables normalized, except for the 2 dummies.
+
+
+data_frame_unscaled_with_dummies = data.frame(EXP, PUP, ATT8SCR, LAPAY, RATPUPTEA, WTEA, PFSM, EXPP, PENGFL, SHEXPLRES, DLONDON, DMIXED)    # Unscaled data frame with the DMIXED and DLONDON dummies
+  data_frame_unscaled_no_dummies = data.frame(EXP, PUP, ATT8SCR, LAPAY, RATPUPTEA, WTEA, PFSM, EXPP, PENGFL, SHEXPLRES)                     # Unscaled data frame without the DMIXED and DLONDON dummies
+    scaled_data_frame_no_dummies = scale(data_frame_unscaled_no_dummies)                                                                    # Scaled data frame with no dummies
+               scaled_data_frame = data.frame(scaled_data_frame_no_dummies, DLONDON, DMIXED)                                                # Scaled data frame, with unscaled dummies added
+
+
+head(scaled_data_frame)
+head(data_frame_unscaled_with_dummies)
+
+
+
+
+
+      # We need to run the regressions without the intercept because we are using scaled variables (mean=0 and sd=1).
+      # To remove the intercept from a regression, add a zero on the right hand side: "~ 0"
+      # To use the scaled variables, use "data = scaled_data_frame":
+
+
+
+        # Regressions for Project 2:
+
+regression.project.two.unscaled.A = lm( ATT8SCR ~     PFSM + LAPAY                                  ,                     data = data_frame_unscaled_with_dummies)  # Unscaled, with intercept, from Week 8 code
+regression.project.two.unscaled.B = lm( ATT8SCR ~     PFSM + LAPAY + RATPUPTEA + PENGFL             ,                     data = data_frame_unscaled_with_dummies)  # Unscaled, with intercept, from Week 8 code
+regression.project.two.unscaled.C = lm( ATT8SCR ~     PFSM + LAPAY + RATPUPTEA + PENGFL + SHEXPLRES ,                     data = data_frame_unscaled_with_dummies)  # Unscaled, with intercept, from Week 8 code
+
+regression.project.two.unscaled.1 = lm( ATT8SCR ~     PFSM + LAPAY + RATPUPTEA + PENGFL + SHEXPLRES + DMIXED + DLONDON,   data = data_frame_unscaled_with_dummies)  # Unscaled, with intercept, with dummies
+regression.project.two.scaled.2   = lm( ATT8SCR ~ 0 + PFSM + LAPAY + RATPUPTEA + PENGFL + SHEXPLRES + DMIXED + DLONDON,   data = scaled_data_frame               )  # Scaled, no intercept, with dummies
+
+
+summary(regression.project.two.unscaled.A )
+summary(regression.project.two.unscaled.B )
+summary(regression.project.two.unscaled.C )
+
+summary(regression.project.two.unscaled.1 )
+summary(regression.project.two.scaled.2   )
+
+
+
+
+
+
+        # Compare the results of the regressions:
+        # The "tab_model()" function will open the results on your internet browser
+        # More information here: https://www.rdocumentation.org/packages/sjPlot/versions/2.8.7/topics/tab_model
+
+
+
+        # Regressions for Project 2:
+
+
+tab_model(   
+                regression.project.two.unscaled.A,
+                regression.project.two.unscaled.B,
+                regression.project.two.unscaled.C,
+
+                regression.project.two.unscaled.1,
+
+                regression.project.two.scaled.2,
+
+
+                show.ci = 0.95, 
+            collapse.ci = TRUE,
+            collapse.se = TRUE,
+                p.style = "stars",
+                show.se = TRUE,
+             show.fstat = TRUE,
+               show.aic = TRUE,
+                 digits = 2         )
+
+```
+
+*Figure 3.8* external | Source: Own computation based on DfE (2018)
+
+The above figure is the consolidated regression table which differs from the previous as it includes the dummy variables whether it is a mixed-gender school (DMIXED) and whether the school is in London (DLONDON) - in both cases 1 = Yes. It shows that a school being in London tends to have a higher ATT8SCR by 3.72 points. The last column which includes the all variable scaled using each individual standard deviation to be able to standardise the data and make it easily comparable. Examining this column, we see that DMIXED[0] and DLONDON[1] have the highest coefficients - telling us that they have the greatest positive effect on ATT8SCR. 
+
+
+## Policy Discussion
+
+The analysis from numerous sections above tells us a great deal about regional inequalities and determinants of secondary school student performance in England. From doing the regressions, it was made clear that many variables affect Attainment 8 score with PFSM being one of them. One key takeaway that comes out of it is London outperforming other regions, and there is clearly a poverty-induced attainment gap as is also reported in the news.
+
+A solution that I suggest to overcome this since PFSM and poverty is likely to increase is to increase SHEXPLRES. Although the implications of having more learning resources do not combat a student's financial hardship situation, it means that when they are at school they can have access to tools that should positively affect their engagement thus grades too. Since it was shown by UCL (2017) that "poorer pupils get less help than better-off classmates with homework", another solution could be family hubs to get parents involved with children's learning. 
+ 
+
+## Conclusion 
+ 
+This project has looked at secondary school student performance in England by looking at the extent of regional inequalities, recent evolution of income inequality within the borough with the highest and lowest score and factors associated with higher average student performance. Overall, there is a clear divide in regions driven by the many factors touched on in this project - such as poverty and access to good learning. 
+ 
+
+# References
+
+UCL News (2017) 'Poorer pupils get less help than better-off classmates with homework', 8 September, p. 1. URL: https://www.ucl.ac.uk/news/2017/sep/poorer-pupils-get-less-help-better-classmates-homework
 
